@@ -33,6 +33,9 @@ env/
 # VS Code
 .vscode/
 
+# dependencies
+/node_modules
+
 # Jupyter Notebook
 .ipynb_checkpoints
 
