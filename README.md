@@ -19,6 +19,7 @@ Demo/
 │   └── endpoints.py       # API route definitions
 ├── db/
 │   └── database.py        # Database connection and session management
+├── frontend/              # Frontend application
 ├── models/
 │   └── models.py          # SQLAlchemy ORM models
 ├── schemas/

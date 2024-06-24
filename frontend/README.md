@@ -1,17 +1,21 @@
-# Excel-like App Frontend
+# Demo Table App Frontend
 
 This is the frontend for the Excel-like Demo application, built with React and Handsontable.
 
 ## Setup
 
 1. Install dependencies:
+   ```
     npm install
+   ```
 2. Start the development server:
+   ```
     npm start
+   ```
 The application will be running at `http://localhost:3000`.
 
 ## Project Structure
-
+```
 - `src/`: Source files
 - `components/`: React components
  - `SpreadsheetComponent.js`: Main spreadsheet component
@@ -21,6 +25,7 @@ The application will be running at `http://localhost:3000`.
  - `api.js`: Functions for API calls
 - `App.js`: Main App component
 - `index.js`: Entry point
+```
 
 ## Available Scripts
 
