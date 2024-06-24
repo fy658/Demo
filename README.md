@@ -9,6 +9,7 @@ This project implements the backend for an Excel-like table application using Fa
 - Statistical calculations (average, standard deviation)
 
 ## Project Structure
+```
 Demo/
 │
 ├── .venv/                 # Virtual environment (not tracked by git)
@@ -26,6 +27,7 @@ Demo/
 ├── main.py                # FastAPI application entry point
 ├── requirements.txt       # Project dependencies
 └── test_api.py         # pytest tests for the API
+```
 
 ## Setup
 
