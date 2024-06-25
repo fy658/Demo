@@ -77,6 +77,23 @@ Once the server is running, you can access the automatic API documentation:
 - Swagger UI: `http://localhost:8000/docs`
 - ReDoc: `http://localhost:8000/redoc`
 
+## Frontend set up
+
+1. Navigate to the frontend directory: 
+  ```
+   cd frontend
+  ```
+2. Install dependencies:
+   ```
+    npm install
+   ```
+3. Start the development server:
+   ```
+    npm start
+   ```
+The application will be running at `http://localhost:3000`.
+
+
 ## Testing
 
 You can use the `test_api.py` file to test the API endpoints. This file is compatible with REST Client extensions in various IDEs.
