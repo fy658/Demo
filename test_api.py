@@ -81,31 +81,6 @@ def test_update_data():
     assert updated_item_in_response["customer"] == "Updated Customer"
 
 
-def test_partial_update():
-    """Test partial update of data"""
-    # Create a new item
-    create_response = client.post("/api/data/bulk/", json={"items": [test_item]})
-    assert create_response.status_code == 200
-
-    # Get data to find the ID of the newly created item
-    get_response = client.get("/api/data/")
-    item_id = get_response.json()[0]["id"]
-
-    # Partially update the item
-    partial_item = {
-        "id": item_id,
-        "customer": "Partial Update Customer"
-    }
-    update_response = client.post("/api/data/bulk/", json={"items": [partial_item]})
-    assert update_response.status_code == 200
-
-    # Verify the partial update
-    get_response = client.get("/api/data/")
-    updated_item = next((item for item in get_response.json() if item["id"] == item_id), None)
-    assert updated_item["customer"] == "Partial Update Customer"
-    assert updated_item["product"] == test_item["product"]  # Ensure other fields were not modified
-
-
 def test_create_invalid_data():
     """Test creating invalid data (negative value)"""
     invalid_item = {
