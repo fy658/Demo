@@ -40,7 +40,9 @@ Demo/
   ```
    cd Demo
   ```
-3. Create a virtual environment:
+3. Create a virtual environment: 
+   Python version: 3.12, 
+   other version may lead to install package error
   ```
    python -m venv venv
   ```
@@ -93,7 +95,8 @@ Once the server is running, you can access the automatic API documentation:
   ```
    cd frontend
   ```
-2. Install dependencies:
+2. Install dependencies: 
+   Nodejs version:  16.16.0
    ```
     npm install
    ```
@@ -114,6 +117,7 @@ This application demonstrates an Excel-like interface built using HandsonTable a
 
 1. Data Entry and Manipulation:
    - You can operate with data just like in Excel, entering information into one or multiple rows.
+   - Click the button to save you data you input.
 
 2. Formula Application:
    - After inputting a formula, you can drag it horizontally or vertically, just as in Excel.
