@@ -41,8 +41,8 @@ Demo/
    cd Demo
   ```
 3. Create a virtual environment: 
-   Python version: 3.12, 
-   other version may lead to install package error
+   - Python version: 3.12, 
+   - other version may lead to install package error
   ```
    python -m venv venv
   ```
@@ -96,7 +96,7 @@ Once the server is running, you can access the automatic API documentation:
    cd frontend
   ```
 2. Install dependencies: 
-   Nodejs version:  16.16.0
+   - Nodejs version:  16.16.0
    ```
     npm install
    ```
