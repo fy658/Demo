@@ -5,23 +5,29 @@ import { registerAllModules } from 'handsontable/registry';
 import 'handsontable/dist/handsontable.full.css';
 import { fetchData, saveData } from '../services/api';
 
+// Register all Handsontable modules
 registerAllModules();
 
 const SpreadsheetComponent = () => {
+  // State for storing the current data and the original data for comparison
   const [data, setData] = useState([]);
   const [originalData, setOriginalData] = useState([]);
+  // Ref for accessing the Handsontable instance
   const hotRef = useRef(null);
 
+  // Load data when the component mounts
   useEffect(() => {
     loadData();
   }, []);
 
+  // Function to fetch data from the API
   const loadData = async () => {
     const fetchedData = await fetchData();
     setData(fetchedData.length > 0 ? fetchedData : [createEmptyRow()]);
     setOriginalData(fetchedData.length > 0 ? JSON.parse(JSON.stringify(fetchedData)) : []);
   };
 
+  // Function to create an empty row
   const createEmptyRow = () => ({
     customer: '',
     product: '',
@@ -33,6 +39,7 @@ const SpreadsheetComponent = () => {
     width3: null,
   });
 
+  // Column definitions for the table
   const columns = [
     { data: 'customer', type: 'text' },
     { data: 'product', type: 'text' },
@@ -44,6 +51,7 @@ const SpreadsheetComponent = () => {
     { data: 'width3', type: 'numeric', numericFormat: { pattern: '0,0.00' } },
   ];
 
+  // Handler for changes in the table
   const handleAfterChange = (changes, source) => {
     if (source === 'loadData') return;
 
@@ -60,80 +68,90 @@ const SpreadsheetComponent = () => {
     }
   };
 
+  // Function to validate the data
   const validateData = () => {
-  const hot = hotRef.current.hotInstance;
-  const errors = [];
+    const hot = hotRef.current.hotInstance;
+    const errors = [];
 
-  data.forEach((row, rowIndex) => {
-    columns.forEach((column, columnIndex) => {
-      // Only validate non-empty numeric fields
-      if (column.type === 'numeric' && row[column.data] !== null && row[column.data] !== '') {
-        const value = parseFloat(row[column.data]);
-        if (isNaN(value) || value < 0) {
-          errors.push(`Invalid value at row ${rowIndex + 1}, column ${column.data}`);
-          hot.setCellMeta(rowIndex, columnIndex, 'className', 'htInvalid');
-        } else {
-          hot.setCellMeta(rowIndex, columnIndex, 'className', '');
+    data.forEach((row, rowIndex) => {
+      columns.forEach((column, columnIndex) => {
+        const cellValue = hot.getDataAtCell(rowIndex, columnIndex);
+        const isFormula = typeof cellValue === 'string' && cellValue.startsWith('=');
+
+        if (column.type === 'numeric') {
+          let valueToValidate = cellValue;
+          if (isFormula) {
+            // Get the calculated value for formula cells
+            valueToValidate = hot.getSourceDataAtCell(rowIndex, columnIndex);
+          }
+
+          if (valueToValidate !== null && valueToValidate !== '') {
+            const numValue = parseFloat(valueToValidate);
+            if (isNaN(numValue) || numValue < 0) {
+              errors.push(`Invalid value at row ${rowIndex + 1}, column ${column.data}`);
+              hot.setCellMeta(rowIndex, columnIndex, 'className', 'htInvalid');
+            } else {
+              hot.setCellMeta(rowIndex, columnIndex, 'className', '');
+            }
+          }
         }
-      }
+      });
     });
-  });
 
-  // Render the table to reflect the validation changes
-  hot.render();
-  return errors;
-};
+    hot.render();
+    return errors;
+  };
 
+  // Handler for saving data
   const handleSave = async () => {
-  const errors = validateData();
-  if (errors.length > 0) {
-    alert(`Invalid data entries:\n${errors.join('\n')}`);
-  } else {
-    try {
-      const changedData = data
-        .filter((row, index) => {
-          // Check if the row is completely empty
-          const isRowCompletelyEmpty = Object.values(row).every(value => value === '' || value === null);
-          // Check if the row has any changes compared to the original data
-          const hasChanges = index >= originalData.length ||
-            Object.keys(row).some(key => row[key] !== originalData[index]?.[key]);
+    const hot = hotRef.current.hotInstance;
+    const errors = validateData();
 
-          // Keep rows that are not completely empty and have changes
-          return !isRowCompletelyEmpty && hasChanges;
-        })
-        .map(row => {
-          // Create a new object, keeping all non-undefined values, including empty strings and null
-          const cleanRow = Object.fromEntries(
-            Object.entries(row).filter(([_, value]) => value !== undefined)
-          );
-
-          // Convert numeric fields to number type, but only for non-empty values
-          ['length1', 'length2', 'length3', 'width1', 'width2', 'width3'].forEach(field => {
-            if (field in cleanRow && cleanRow[field] !== '' && cleanRow[field] !== null) {
-              cleanRow[field] = parseFloat(cleanRow[field]);
+    if (errors.length > 0) {
+      alert(`Invalid data entries:\n${errors.join('\n')}`);
+    } else {
+      try {
+        // Prepare data for saving, including calculated values from formulas
+        const dataToSave = data.map((row, rowIndex) => {
+          const updatedRow = { ...row };
+          columns.forEach((column, columnIndex) => {
+            const cellValue = hot.getDataAtCell(rowIndex, columnIndex);
+            const isFormula = typeof cellValue === 'string' && cellValue.startsWith('=');
+            if (isFormula) {
+              // Get the calculated value for formula cells
+              updatedRow[column.data] = hot.getSourceDataAtCell(rowIndex, columnIndex);
+            } else {
+              updatedRow[column.data] = cellValue;
             }
           });
-
-          return cleanRow;
+          return updatedRow;
         });
 
-      if (changedData.length > 0) {
-        console.log("Data to be sent:", { items: changedData });
-        // Send the changed data to the server
-        await saveData({ items: changedData });
-        alert('Data saved successfully');
-        // Update the original data to reflect the current state
-        setOriginalData(JSON.parse(JSON.stringify(data)));
-      } else {
-        alert('No changes to save');
-      }
-    } catch (error) {
-      alert('Error saving data');
-      console.error('Error saving data:', error);
-    }
-  }
-};
+        // Filter out unchanged and empty rows
+        const changedData = dataToSave.filter((row, index) => {
+          const isRowCompletelyEmpty = Object.values(row).every(value => value === '' || value === null);
+          const hasChanges = index >= originalData.length ||
+            JSON.stringify(row) !== JSON.stringify(originalData[index]);
+          return !isRowCompletelyEmpty && hasChanges;
+        });
 
+        if (changedData.length > 0) {
+          console.log("Data to be sent:", { items: changedData });
+          await saveData({ items: changedData });
+          alert('Data saved successfully');
+          setOriginalData(JSON.parse(JSON.stringify(dataToSave)));
+          setData(dataToSave);
+        } else {
+          alert('No changes to save');
+        }
+      } catch (error) {
+        console.error('Error saving data:', error);
+        alert('Error saving data');
+      }
+    }
+  };
+
+  // Settings for the Handsontable instance
   const hotSettings = {
     data: data,
     columns: columns,
@@ -148,6 +166,7 @@ const SpreadsheetComponent = () => {
     fillHandle: true,
   };
 
+  // Render the component
   return (
     <div className="spreadsheet-container">
       <HotTable

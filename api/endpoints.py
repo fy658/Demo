@@ -19,27 +19,33 @@ async def get_data(db: Session = Depends(get_db)):
 
 # Define route to save data
 @router.post("/data/bulk/")
-async def bulk_update_data(bulk_data: BulkDataUpdate):
-    # Get database session
-    db = next(get_db())
+async def bulk_update_data(bulk_data: BulkDataUpdate, db: Session = Depends(get_db)):
     try:
         for item in bulk_data.items:
             if item.id:
                 # Update existing item
                 db_item = db.query(Data).filter(Data.id == item.id).first()
                 if db_item:
+                    # Update only the fields that are provided
                     for key, value in item.dict(exclude_unset=True).items():
-                        setattr(db_item, key, value)
+                        if value is not None:  # Only update non-None values
+                            setattr(db_item, key, value)
                 else:
                     raise HTTPException(status_code=404, detail=f"Item with id {item.id} not found")
             else:
                 # Create new item
-                db_item = Data(**item.dict(exclude_unset=True))
-                db.add(db_item)
+                # Ensure at least one field other than id is provided
+                if any(value is not None for key, value in item.dict().items() if key != 'id'):
+                    db_item = Data(**item.dict(exclude_unset=True))
+                    db.add(db_item)
+                else:
+                    raise HTTPException(status_code=400, detail="New items must have at least one non-null field")
+
         db.commit()
         return {"message": "Data updated successfully"}
+    except HTTPException as http_exc:
+        db.rollback()
+        raise http_exc
     except Exception as e:
         db.rollback()
         raise HTTPException(status_code=500, detail=str(e))
-    finally:
-        db.close()
