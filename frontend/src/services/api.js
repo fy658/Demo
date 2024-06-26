@@ -13,25 +13,18 @@ export const fetchData = async () => {
   }
 };
 
-// Save data
-export const saveData = async (changes, data) => {
-  try {
-    for (const [row, prop, oldValue, newValue] of changes) {
-      const updatedRow = { ...data[row], [prop]: newValue };
-      await axios.post(`${API_BASE_URL}/data/`, updatedRow);
-    }
-  } catch (error) {
-    console.error('Error saving data:', error);
-  }
-};
 
-// Fetch statistics
-export const fetchStats = async () => {
+// Save data (supports both single row and multiple rows)
+export const saveData = async (changedData) => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/stats/`);
+    const response = await axios.post(`${API_BASE_URL}/data/bulk/`, changedData);
     return response.data;
   } catch (error) {
-    console.error('Error fetching stats:', error);
-    return {};
+    console.error('Error saving data:', error);
+    if (error.response) {
+      console.error('Response status:', error.response.status);
+      console.error('Response data:', error.response.data);
+    }
+    throw error;
   }
 };

@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import Optional
+from typing import List, Optional
 
 
 class DataItem(BaseModel):
@@ -12,3 +12,7 @@ class DataItem(BaseModel):
     width1: float
     width2: float
     width3: float
+
+
+class BulkDataUpdate(BaseModel):
+    items: List[DataItem]

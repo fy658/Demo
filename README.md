@@ -101,8 +101,30 @@ Once the server is running, you can access the automatic API documentation:
    ```
     npm start
    ```
-The application will be running at `http://localhost:3000`.
+The application will be running at `http://localhost:3000`, the UI in browser like below picture:
 
+
+![Excel-like App Screenshot](./frontend/public/pic1.png)
+
+This application demonstrates an Excel-like interface built using HandsonTable and powered by HyperFormula for calculations.
+
+![Excel-like App Screenshot](./frontend/public/pic2.png)
+
+## How to Use in frontend UI:
+
+1. Data Entry and Manipulation:
+   - You can operate with data just like in Excel, entering information into one or multiple rows.
+
+2. Formula Application:
+   - After inputting a formula, you can drag it horizontally or vertically, just as in Excel.
+   - This action will automatically apply the formula to subsequent cells, calculating results based on the relative references.
+
+For example:
+- Enter a formula like `=AVERAGE(C1:C5)` in cell C6.
+- Click and drag the bottom-right corner of cell C6 down to apply the formula to cells C7, C8, etc.
+- The app will adjust the cell references automatically (e.g., C7 will contain `=AVERAGE(C2:C6)`).
+
+This functionality allows for quick and efficient data analysis and calculation across your spreadsheet.
 
 ## Testing
 
