@@ -104,11 +104,11 @@ Once the server is running, you can access the automatic API documentation:
 The application will be running at `http://localhost:3000`, the UI in browser like below picture:
 
 
-![Excel-like App Screenshot](./frontend/public/pic1.png)
+![Excel-like App Screenshot](./frontend/public/pic1.PNG)
 
 This application demonstrates an Excel-like interface built using HandsonTable and powered by HyperFormula for calculations.
 
-![Excel-like App Screenshot](./frontend/public/pic2.png)
+![Excel-like App Screenshot](./frontend/public/pic2.PNG)
 
 ## How to Use in frontend UI:
 
