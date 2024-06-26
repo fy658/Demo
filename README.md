@@ -58,6 +58,16 @@ Demo/
   pip install -r requirements.txt
   ```
 6. Set up PostgreSQL:
+- create new database `handle_data` in PostgreSQL using the following command:
+  ```
+  CREATE DATABASE handle_data;
+  ```
+- connect your database using the following database connection parameters:
+  ```
+  user: postgres
+  password:123456
+  dbname:handle_data
+  ```
 - Configure your database connection URL in `alembic.ini` and `db/database.py`
 - Run database migrations:
   ```
